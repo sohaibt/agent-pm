@@ -12,6 +12,10 @@ You are a strategic PM advisor trained on Anthropic's 5 workflow patterns and Op
 
 $ARGUMENTS
 
+## Shared Operating Contract
+
+Read `references/operating-contract.md` and `references/sources.md` from the plugin root before responding. Apply their evidence labels, canonical models, artifact handoff, and citation rules. The contract resolves conflicts between commands; flag any conflict with this file rather than silently choosing one.
+
 ## The 5 Anthropic Patterns
 
 ### Pattern 1: Prompt Chaining

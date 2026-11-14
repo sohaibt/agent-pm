@@ -1,6 +1,6 @@
 ---
 name: guardrails-plan
-description: Design a layered guardrail stack for an AI agent product. Based on OpenAI's 7-layer guardrail framework plus mandatory human-in-the-loop triggers. Determines which guardrails to build, in what priority, with what tripwires. Use BEFORE shipping to avoid the SmarterX-class failures.
+description: Design a layered guardrail stack for an AI agent product. Based on OpenAI's guardrail framework, default approval for high-risk actions, and infrastructure controls. Determines which layers apply, their tripwires, and launch priorities.
 argument-hint: [describe the agent purpose, what tools it has, whether it's user-facing or internal, and your risk tolerance]
 ---
 
@@ -18,6 +18,10 @@ Per the SmarterX database deletion failure: **safety lives below the model.** Pe
 
 $ARGUMENTS
 
+## Shared Operating Contract
+
+Read `references/operating-contract.md` and `references/sources.md` from the plugin root before responding. Apply their evidence labels, canonical models, artifact handoff, and citation rules. The contract resolves conflicts between commands; flag any conflict with this file rather than silently choosing one.
+
 ## The 7 OpenAI Guardrail Layers
 
 | # | Guardrail | What it catches | Implementation |
@@ -30,12 +34,12 @@ $ARGUMENTS
 | 6 | **Rules-based protections** | Known threat patterns (SQL injection, blocklisted terms) | Regex, deny lists, format validation |
 | 7 | **Output validation** | Brand-damaging or off-spec responses | LLM-as-judge or rules on output |
 
-## The 2 Mandatory Human-in-the-Loop Triggers
+## The 2 Default Human-in-the-Loop Triggers
 
-Per OpenAI — these are non-negotiable for production agents:
+Apply OpenAI's escalation patterns with explicit product risk decisions:
 
 1. **Exceeding failure thresholds** — set retry/action limits. Escalate to human if agent fails to resolve after N attempts.
-2. **High-risk actions** — irreversible or high-stakes operations (delete, charge, send, transfer) must trigger human oversight until the agent has earned trust through track record.
+2. **High-risk actions** — irreversible or high-stakes operations (delete, charge, send, transfer) require human approval by default. Conditional autonomy requires explicit risk acceptance, tested recovery, least-privilege limits, audit evidence, and a measured reliability threshold.
 
 ## Architecture: Optimistic vs. Conservative Execution
 
@@ -203,4 +207,4 @@ Customized to this agent:
 - Per SmarterX: model safety ≠ system safety. You can have a perfect model and still wipe production data because the agent could read a credential file.
 - Test your guardrails by trying to break your own agent. Red-team it before users do.
 - Internal agents have lower guardrail needs than user-facing. Don't over-engineer if scope is narrow.
-- For agents with payment, deletion, or external messaging tools: human approval is non-negotiable until the agent has 6+ months of clean track record.
+- For payment, deletion, external messaging, and other irreversible actions: require human approval by default. Any move to conditional approval needs explicit risk acceptance, tested recovery, least-privilege limits, audit evidence, and a measured reliability threshold; elapsed time alone never earns an exception.

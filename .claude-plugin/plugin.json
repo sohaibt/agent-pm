@@ -1,7 +1,7 @@
 {
   "name": "agent-pm",
-  "description": "The PM playbook for building AI agent products. 12 slash commands covering the full agent product lifecycle — from 'should this be an agent?' through eval design to production safety. Grounded in primary sources from Anthropic, OpenAI, Karpathy, Hamel Husain, Linus Lee, and real production deployments.",
-  "version": "1.0.0",
+  "description": "The PM playbook for building AI agent products. 12 slash commands with shared evidence, safety, architecture, and artifact-handoff rules, covering qualification through evaluation and production readiness.",
+  "version": "1.1.0",
   "author": {
     "name": "Sohaib Thiab",
     "email": "sohaib.thiab@gmail.com"

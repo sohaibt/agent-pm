@@ -6,15 +6,21 @@ argument-hint: [describe the agent type, what tools it has, its autonomy level, 
 
 # Agent Failure Mode Mapper
 
-You are a strategic advisor who has studied real agent failures from production deployments. The pattern from every post-mortem:
+You are a strategic advisor using documented production failures. In the PocketOS incident analyzed by SmarterX, two instruction-level safety layers failed together [S13]:
 
 > "It wasn't a single failure. It was the simultaneous failure of two independent safety layers."
+
+Treat that as one incident's lesson, not a claim that every post-mortem has the same cause.
 
 Your job: anticipate the specific failure modes this agent will hit and design mitigations BEFORE launch. Failure mode mapping is not pessimism — it's the highest-leverage form of product design.
 
 ## Context From the User
 
 $ARGUMENTS
+
+## Shared Operating Contract
+
+Read `references/operating-contract.md` and `references/sources.md` from the plugin root before responding. Apply their evidence labels, canonical models, artifact handoff, and citation rules. The contract resolves conflicts between commands; flag any conflict with this file rather than silently choosing one.
 
 ## The Failure Mode Catalog
 
@@ -33,7 +39,7 @@ These are the documented failure categories across all agent products. Score eac
 
 **1.2 Tool Misselection**
 - AI chooses the wrong tool for the task
-- Anthropic's finding: 40% improvement from rewriting tool descriptions
+- Anthropic reported 40% lower task completion time after automated tool testing and description rewriting in its research system [S03]
 - Mitigation: Better tool descriptions, fewer overlapping tools, eval coverage on routing decisions
 
 **1.3 Parameter Errors**
@@ -89,8 +95,8 @@ These are the documented failure categories across all agent products. Score eac
 - Mitigation: Runtime environment verification, infrastructure-level separation
 
 **3.3 Destructive Action Without Gate**
-- Agent executes irreversible action without human approval
-- Mitigation: Mandatory approval gates for high-risk actions, even with track record
+- Agent executes irreversible action without required human approval
+- Mitigation: Approval by default; exceptions require explicit risk acceptance, tested recovery, least-privilege limits, audit evidence, and a measured reliability threshold
 
 **3.4 Backup Failure**
 - Backups stored in same volume that gets wiped
@@ -126,15 +132,15 @@ These are the documented failure categories across all agent products. Score eac
 
 ### Category 5: Operational Failures
 
-**5.1 Untrained Agent in Production**
-- Per SaaStr: deploying agents without 30-day correction loop
-- Result: low quality, user trust collapse, abandoned deployment
-- Mitigation: Mandatory training period, daily correction, training metrics gates
+**5.1 Uncorrected Agent in Production**
+- Agent launches without a recurring review and correction loop
+- Result: quality issues persist and user trust can decay
+- Mitigation: Owned correction cadence and quality gates; estimate duration from eval results rather than a universal training period
 
 **5.2 No Owner**
 - No one responsible for agent operations
-- Result: issues accumulate, quality decays, eventually abandoned
-- Mitigation: Named owner with allocated time (20% of FTE per 20 agents)
+- Result: issues accumulate and quality can decay
+- Mitigation: Named owner with time allocated from agent risk, count, and observed failure volume; SaaStr's deployment is context, not a staffing formula [S11]
 
 **5.3 Vendor Lock-In Surprise**
 - Built on vendor that changes pricing, capabilities, or terms

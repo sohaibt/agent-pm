@@ -14,6 +14,10 @@ The user is considering building an AI feature. Your job is to talk them out of 
 
 $ARGUMENTS
 
+## Shared Operating Contract
+
+Read `references/operating-contract.md` and `references/sources.md` from the plugin root before responding. Apply their evidence labels, canonical models, artifact handoff, and citation rules. The contract resolves conflicts between commands; flag any conflict with this file rather than silently choosing one.
+
 ## The Simplicity Ladder
 
 Every AI feature should be evaluated against this ladder. Start at the bottom; only climb if the rung below proves insufficient.
@@ -61,7 +65,7 @@ Ask: "What would have to be true for the rung BELOW to work?" If a simpler solut
 For each rung above 1, surface costs the user may not have considered:
 - Eval infrastructure burden
 - Production observability requirements
-- Latency and token cost multipliers (Rung 3 = 4x tokens, Rung 4 = 15x)
+- Latency and token cost ranges (Anthropic reported roughly 4x for agents and 15x for multi-agent in its research context; treat these as planning hypotheses, not universal constants)
 - Failure mode complexity
 - Human-in-the-loop design
 
@@ -84,18 +88,18 @@ Confidence: [High / Medium / Low]
 ### What This Means in Practice
 
 For the recommended rung:
-- **Build effort:** Rough estimate (days/weeks/months)
-- **Token cost:** Per-task estimate vs. baseline
-- **Eval complexity:** What you'll need to evaluate this
-- **Failure mode count:** How many distinct things can go wrong
-- **Time-to-production:** How long until this can ship safely
+- **Build effort:** A range labeled Assumption with its drivers, or Unknown when integrations and team capacity are unclear
+- **Token cost:** Call structure and explicit assumptions; dollar cost is Unknown without current model prices and observed volumes
+- **Eval complexity:** The behaviors to evaluate, without prescribing dataset sizes; defer alignment and sample-size design to `eval-design`
+- **Failure mode categories:** Material failure categories, not an invented exact count
+- **Time-to-production:** A range with assumptions, or Unknown until evaluation gaps and team capacity are known
 
 ### If You Were Tempted to Build Higher
 
 If the user's framing suggests they wanted to build at a higher rung than recommended:
 - Name the temptation explicitly ("It's tempting to build this as a multi-agent system because...")
-- Explain why that's the wrong move ("...but X is true, which means a workflow handles this better.")
-- Offer the upgrade path ("If after 3 months [specific evidence], escalate to rung X.")
+- Explain why that's the wrong move using concrete task requirements rather than an unsupported effort or cost ratio
+- Offer an evidence-based upgrade path ("If [observed failure or requirement], evaluate rung X"); elapsed time alone is not a trigger
 
 ### Red Flags Detected
 
@@ -107,19 +111,22 @@ Flag any of these in the user's description:
 - **"Just make it work like ChatGPT"** — chat as default instead of right UX
 - **No clear success criterion** — "good response" is not a metric
 
+Do not infer task value, ticket volume, error rates, or affordability from customer count alone. Do not introduce numerical effort, cost, prompt, or evaluation ratios unless they are source-backed or calculated from explicit assumptions.
+
 ### Pressure-Test Questions
 
 End with 3 questions that challenge the recommendation:
 
 Example patterns:
 - "If the LLM gave a wrong answer 1 in 100 times, what would happen? Is that acceptable?"
-- "Could you ship a deterministic version in 1 week and learn what AI would actually add?"
+- "What is the smallest deterministic or manual baseline we could measure before adding AI?"
 - "What's the cost of the WORST agent failure here? If catastrophic, is the upside worth the risk?"
 
 ## Important Notes
 
 - Default to recommending the lowest viable rung. Anthropic and OpenAI both explicitly warn against unnecessary complexity.
 - "Agents are exciting" is not a reason to build an agent. "Users will give up if the wrong tool fires" is a reason to escalate carefully.
-- For early-stage products: bias even harder toward simplicity. You don't have eval infrastructure or production observability yet.
+- For early-stage products: bias even harder toward simplicity when eval infrastructure or production observability is absent; do not assume either is absent without evidence.
 - For high-volume, low-margin features: token cost matters MORE than capability. Rung 4 may be unaffordable.
 - If the user's situation is genuinely novel and complex, recommend agent — but always with explicit guardrails and eval criteria defined upfront.
+- Follow the shared core path in the artifact handoff. When proceeding to build after qualification, recommend `agent-spec` and include `architecture-pattern` only if a pattern decision is needed. If evidence must be gathered first, recommend no next command until that evidence exists.

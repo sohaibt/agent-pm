@@ -16,6 +16,10 @@ Every AI feature must make an explicit decision about WHERE on the autonomy spec
 
 $ARGUMENTS
 
+## Shared Operating Contract
+
+Read `references/operating-contract.md` and `references/sources.md` from the plugin root before responding. Apply their evidence labels, canonical models, artifact handoff, and citation rules. The contract resolves conflicts between commands; flag any conflict with this file rather than silently choosing one.
+
 ## The 5-Position Autonomy Spectrum
 
 | Position | Description | Human role | AI role | Verification |
@@ -43,10 +47,12 @@ Position depends on 4 variables:
 - **Catastrophic cost (lost users/legal exposure):** Manual or single-action
 
 ### Variable 3: AI Accuracy
-- **>99% on this task:** Higher autonomy justified
-- **95-99%:** Medium with verification UX
-- **80-95%:** Suggestion mode only
-- **<80%:** Probably shouldn't ship
+These bands are illustrative planning hypotheses, not thresholds from Karpathy. Use representative eval results, failure severity, and confidence intervals to set product-specific gates:
+- **>99% on this task:** Higher autonomy may be justified if other variables allow it
+- **95-99%:** Consider medium autonomy with verification UX
+- **80-95%:** Start with suggestion mode unless a lower-risk evaluation supports otherwise
+- **<80%:** Do not ship autonomous execution for this task without evidence that the user outcome remains acceptable
+- **Unknown:** Do not infer accuracy from demos or model reputation; propose the smallest eval needed
 
 ### Variable 4: User Trust Level
 - **New users:** Lower autonomy (build trust first)
@@ -186,5 +192,5 @@ Customized for this feature:
 - Most teams default to too much autonomy. Karpathy's specific warning: "Keep the AI on the leash."
 - Position 4 (full autonomy) should be earned over months, not designed in v0.
 - Different actions within the same feature can have different positions. Reading data = full autonomy; deleting data = single-action approval.
-- For agents specifically: full autonomy is appropriate for read-only research, NEVER for destructive writes without extensive track record.
+- For agents specifically: full autonomy is appropriate for read-only research; destructive writes require approval by default, and exceptions require explicit risk acceptance, tested recovery, least-privilege limits, audit evidence, and a measured reliability threshold.
 - The verification UX is more important than the autonomy position itself. Bad verification UX makes any autonomy level fail.

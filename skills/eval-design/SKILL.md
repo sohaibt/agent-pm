@@ -18,13 +18,17 @@ Your job: produce a complete, immediately-buildable eval plan for the user's age
 
 $ARGUMENTS
 
+## Shared Operating Contract
+
+Read `references/operating-contract.md` and `references/sources.md` from the plugin root before responding. Apply their evidence labels, canonical models, artifact handoff, and citation rules. The contract resolves conflicts between commands; flag any conflict with this file rather than silently choosing one.
+
 ## The 3-Level Eval Framework
 
-| Level | What | When | Cost | Build time |
-|-------|------|------|------|-----------|
-| **Level 1: Unit tests** | Deterministic assertions (pytest-style) | Every code change | Free | Hours |
-| **Level 2: Human + Model eval** | Trace review + LLM-as-judge aligned with humans | Set cadence (weekly?) | $100-500/month | 1 day for viewer, weeks for dataset |
-| **Level 3: A/B testing** | Live experiments on real users | Mature stage only | High | Standard A/B infra |
+| Level | What | When | Cost and effort |
+|-------|------|------|-----------------|
+| **Level 1: Unit tests** | Deterministic assertions (pytest-style) | Every relevant change | Estimate from integration and scenario complexity |
+| **Level 2: Human + Model eval** | Trace review + LLM-as-judge aligned with humans | Cadence based on change and drift | Estimate reviewer, labeling, tooling, and model costs from actual volume |
+| **Level 3: A/B testing** | Live experiments on real users | When earlier levels and traffic support them | Estimate from existing experiment infrastructure and required sample size |
 
 ## Your Design Process
 
@@ -77,8 +81,8 @@ For each, also generate the expected output category (PASS/FAIL/CLARIFY).
 Per Eugene Yan: start with 50-100 fail cases minimum from 200+ total.
 
 **Dataset structure:**
-- Use ORGANIC failures (production traces or weaker model outputs), not synthetic
-- Binary labels only: PASS / FAIL (not 1-5 scales)
+- Use organic failures from production traces or weaker model outputs for judge alignment; synthetic cases may supplement scenario coverage but must not substitute for organic alignment data
+- Use binary PASS / FAIL human and judge labels, not 1-5 scales; keep CLARIFY only as a separate expected agent behavior where applicable
 - Spreadsheet format: trace, expected, actual, human label, notes
 
 **Custom trace viewer:**
@@ -106,16 +110,16 @@ For each dimension, write a judge prompt template with:
 
 ### Step 6: Alignment Process (Critical)
 
-Per Eugene Yan: target Cohen's Kappa of 0.4-0.6+ between human and LLM judges.
+Follow Eugene Yan's alignment method [S06]: use a development set for judge iteration and a held-out test set for the final estimate. Cohen's kappa of 0.4-0.6 is the article's substantial-agreement band, not a universal ship gate; define the product gate using failure cost and human agreement.
 
 Recommend the alignment workflow:
-1. Human labels 25-50 examples (binary)
-2. LLM judge labels same examples
-3. Calculate agreement (precision/recall, not raw accuracy)
-4. Examine disagreements
-5. Iterate on judge prompt
-6. Re-run alignment until Kappa target hit
-7. Lock the judge, but re-validate quarterly
+1. Human labels an initial development sample with binary labels
+2. Split development and held-out test data before judge iteration
+3. Have the LLM judge label the same development examples
+4. Report precision and recall for the trust-busting class, plus Cohen's kappa when useful; do not substitute one for another
+5. Examine disagreements and iterate on the judge prompt using development data only
+6. Evaluate the locked judge once on held-out data against the proposed product gate
+7. Re-validate when the model, rubric, data distribution, or product behavior changes; set cadence from observed drift
 
 ### Step 7: Tracking Infrastructure
 
@@ -135,9 +139,9 @@ Track:
 Agent: [Name]
 Maturity stage: [Early / Growth / Mature]
 Recommended levels: [1 / 1+2 / 1+2+3]
-Initial dataset size: [N synthetic + N organic]
-Alignment target: Cohen's Kappa = [0.4-0.6+]
-Time to first eval: [X days]
+Initial dataset size: [N synthetic + N organic, with rationale]
+Judge gate: [Proposed precision / recall / kappa targets, or Unknown with resolution plan]
+Time to first eval: [Estimate with assumptions, or Unknown]
 ```
 
 ### Level 1: Unit Test Matrix
@@ -189,7 +193,7 @@ Features required:
 - [Quick label buttons]
 - [Export to CSV]
 
-Estimated build time: 1 day
+Estimated build time: [Range based on existing tooling, data access, privacy requirements, and reviewer workflow; otherwise Unknown]
 
 ### Level 2: LLM-as-Judge Prompts
 

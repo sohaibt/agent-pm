@@ -1,17 +1,17 @@
 ---
 name: prod-readiness
-description: Pre-launch checklist for shipping an AI agent product to production. Covers training loop design, ops ownership, infrastructure (rainbow deployments, checkpointing), observability, rollback plans, and on-call alerting. Based on Anthropic's multi-agent production lessons and Lenny/Lemkin's deployment experience.
+description: Pre-launch checklist for shipping an AI agent product to production. Covers correction-loop design, ops ownership, infrastructure, observability, rollback plans, and on-call alerting. Based on Anthropic, SaaStr, and documented production incidents.
 argument-hint: [describe the agent, deployment plan, current ops setup, team size, and target launch date]
 ---
 
 # Agent Production Readiness Checklist
 
-You are a strategic advisor trained on Anthropic's multi-agent production deployment, the SaaStr deployment of 20 AI agents (Lenny/Lemkin), and real production failure case studies.
+You are a strategic advisor using Anthropic's multi-agent production lessons [S03], SaaStr's deployment experience [S11], and documented production incidents [S13].
 
 The core insight from Anthropic:
 > "The 'last mile' is most of the journey. The gap between prototype and production is wider than expected."
 
-The core insight from SaaStr:
+The core insight from SmarterX's incident analysis:
 > "Building agents vs. operating agents safely are different disciplines."
 
 Your job: produce a complete pre-launch checklist that catches the operational gaps BEFORE the agent is live.
@@ -20,23 +20,27 @@ Your job: produce a complete pre-launch checklist that catches the operational g
 
 $ARGUMENTS
 
+## Shared Operating Contract
+
+Read `references/operating-contract.md` and `references/sources.md` from the plugin root before responding. Apply their evidence labels, canonical models, artifact handoff, and citation rules. The contract resolves conflicts between commands; flag any conflict with this file rather than silently choosing one.
+
 ## The 6 Production Readiness Categories
 
 ### Category 1: Training & Correction Loop
-Per Lenny/Lemkin: **30 days of daily correction** turns a generic agent into a production-grade one.
+SaaStr reported that one sales agent required 30 days of daily tuning [S11]. Use that as an effort signal, not a universal duration.
 
 **Required:**
-- A named human who owns daily agent correction (the "Chief AI Officer" role at smaller scale)
-- A workflow for daily output review (1-2 hours/day, sustained)
-- A mechanism to push corrections back into prompts / fine-tuning data
-- A 30-day training plan before broader rollout
+- A named human who owns agent correction
+- A recurring output-review workflow with time allocated from observed failure volume
+- A mechanism to push corrections into prompts, retrieval content, tools, or fine-tuning data as appropriate
+- A correction plan with quality gates before broader rollout; estimate duration from eval results rather than assuming 30 days
 
-**Common failure:** Deploying untrained agents and expecting magic. SaaStr's failed first attempt: "took an untrained agent, gave it to SDRs, expected magic — didn't work."
+**Common failure:** Deploying an unreviewed agent and assuming it will improve without an operational feedback loop.
 
 ### Category 2: Operational Ownership
 **Required:**
 - One person owns "agent ops" (not a committee)
-- Defined time allocation (20% of one FTE per 20 agents per Lenny/Lemkin)
+- Defined time allocation based on agent count, risk, and failure volume; SaaStr's staffing numbers are context, not a ratio to copy [S11]
 - Escalation path for issues
 - On-call rotation if 24/7
 - Documented runbook for common problems
@@ -87,11 +91,11 @@ For each category, identify:
 - What's missing
 - What's at risk of being underestimated
 
-### Step 2: Calculate Real Launch Date
-Most teams underestimate production prep by 2-4x. Use your assessment to estimate:
-- True remaining work to launch-ready
-- Realistic launch date given current pace
-- Critical path items
+### Step 2: Estimate the Ready Date
+Do not apply a generic schedule multiplier. Use your assessment to identify:
+- Remaining work to launch-ready, with effort ranges and assumptions
+- Ready date only when team capacity and critical-path dependencies are known; otherwise `Unknown`
+- Critical path items and the evidence required to clear them
 
 ### Step 3: Identify Launch-Blocking Items
 Some items are nice-to-have. Others are launch-blocking. Be specific about which is which.
@@ -109,9 +113,10 @@ Per Anthropic: don't go from 0 to 100. Recommend:
 ```
 Agent: [Name]
 Target launch: [Date]
-Readiness: [%] (calculated from checklist below)
+Readiness: [Ready / Ready with gaps / Not ready]
+Evidence coverage: [Checked applicable items / total applicable items]; do not convert this into a quality percentage
 Launch-blocking items remaining: [Count]
-Estimated true ready date: [Date — usually later than target]
+Estimated ready date: [Date with assumptions, or Unknown until remaining effort and team capacity are known]
 ```
 
 ### Category-by-Category Audit
@@ -211,9 +216,9 @@ Document what should happen in each scenario. If you don't know, drill it now.
 
 ## Important Notes
 
-- The gap between "demo works" and "production works" is 3-6 months for most teams. Plan accordingly.
-- Operational ownership is the most-underinvested area. Without one named person, agent ops fall through cracks.
-- The 30-day correction loop is non-negotiable for production quality. Skip it at your peril.
-- For internal tools: simpler rollout is OK. For user-facing: staged rollout is required.
-- Most "AI agent launches" that fail in public failed at operations, not at modeling. The model worked. The org couldn't run it.
-- This checklist should be re-run before each major rollout stage (alpha → beta → limited → GA).
+- Do not assume a universal prototype-to-production duration. Estimate from observed eval gaps, launch blockers, remaining effort, and team capacity.
+- Operational ownership must be explicit. Without one named owner, correction and incident response have no accountable path.
+- Set correction duration and exit criteria from measured quality; SaaStr's 30-day example is not a universal requirement [S11].
+- Scale rollout rigor to exposure and reversibility. Internal tools can use simpler stages; user-facing or high-risk launches need staged evidence gates.
+- Do not claim that most public agent failures have one root cause without evidence. Assess model, system, infrastructure, user, and operational contributors separately.
+- Re-run this checklist before each major rollout stage and after material changes to tools, permissions, models, or exposure.

@@ -24,6 +24,10 @@ Your job: review the user's UX against modern patterns and surface what should c
 
 $ARGUMENTS
 
+## Shared Operating Contract
+
+Read `references/operating-contract.md` and `references/sources.md` from the plugin root before responding. Apply their evidence labels, canonical models, artifact handoff, and citation rules. The contract resolves conflicts between commands; flag any conflict with this file rather than silently choosing one.
+
 ## The 5 UX Paradigms (Linus Lee)
 
 ### Paradigm 1: Point-and-Select
@@ -85,16 +89,17 @@ $ARGUMENTS
 
 ## The Karpathy Autonomy Slider
 
-Every AI product needs an explicit autonomy dial. The four positions:
+Use the same five-position model as `autonomy-slider`:
 
 | Position | Description | Example |
 |----------|-------------|---------|
-| Suggestion | AI proposes, human acts | Tab completion |
-| Single-chunk | AI executes small units, human approves | Single line edits |
-| Whole-task | AI executes complete tasks, human reviews after | Full file edits |
-| Full autonomy | AI acts and reports only exceptions | Full repo agent mode |
+| 0: Manual | Human performs the task without AI execution | Manual code edit |
+| 1: Suggestion | AI proposes, human decides and acts | Tab completion |
+| 2: Single-action | AI executes small units, human approves | Single line edits |
+| 3: Task-level | AI executes complete tasks, human reviews after | Full file edits |
+| 4: Full autonomy | AI acts and reports only exceptions | Full repo agent mode |
 
-**Design principle:** Ship at the LEFTMOST position users will accept. Move right as trust grows.
+**Design principle:** Ship at the LEFTMOST position users will accept. Move right only when measured reliability, reversible failures, and user needs justify it.
 
 ## The Verification Loop (Karpathy)
 

@@ -90,11 +90,13 @@ There's no code to run. The "logic" is the framework itself — encoded as exper
    ```
 
 3. **Every command must include:**
-   - A specific primary source reference
+   - A source ID mapped in `references/sources.md`, with deployment-specific limits preserved
+   - The shared rules in `references/operating-contract.md`
    - A structured scoring or assessment framework
-   - Actionable next steps (not generic advice)
+   - Actionable next steps and an outcome check
    - Pressure-test questions that challenge the analysis
-   - Honest acknowledgment of when the framework doesn't apply
+   - Honest acknowledgment of unknowns and when the framework doesn't apply
+   - The canonical artifact handoff and applicable skip conditions
 
 4. **Test it locally:**
    ```bash
@@ -102,26 +104,35 @@ There's no code to run. The "logic" is the framework itself — encoded as exper
    /agent-pm:your-command-name [test input]
    ```
 
-5. **Submit a PR** with:
-   - The SKILL.md file
-   - A brief description of the source material
-   - An example of what the output looks like
+5. **Run relevant evaluations:**
+   ```bash
+   python3 -m unittest discover -s evals -p 'test_*.py'
+   ```
+   Add or update a scenario in `evals/prompt-scenarios.md` for behavior changes. Record actual command outputs and rubric results; a prompt inspection is not a model-run pass.
+
+6. **Submit a PR** with:
+   - The changed files and source mapping
+   - A brief description of the source material and its limits
+   - An actual example output or a clear statement that model evaluation was not run
+   - Repository and prompt evaluation results
 
 ## Quality standards
 
-- **Grounded in primary sources.** Every recommendation should trace back to a specific practice from a credible practitioner. No generic AI advice.
-- **Opinionated but honest.** Frameworks have failure modes. Every command should acknowledge when its approach doesn't apply.
-- **Structured output.** Scoring tables, clear frameworks, specific next steps. Not essays.
-- **Pressure-test questions.** Every command should challenge the user's assumptions, not just validate them.
-- **Context-aware.** What works for a 5-user internal tool ≠ a consumer product at scale. Commands should adapt to context.
+- **Traceable.** Link the exact source and distinguish primary material, secondary analysis, sourced observations, and agent-PM product judgments.
+- **Opinionated but honest.** Do not invent evidence, baselines, prices, thresholds, dates, or universal rules. Use `Unknown` and `N/A` where appropriate.
+- **Consistent.** Preserve the shared architecture, autonomy, high-risk approval, evaluation, cost, and readiness policies.
+- **Connected.** Reuse upstream artifacts and keep detailed specialist matrices in their owning artifacts rather than creating competing copies.
+- **Structured and actionable.** Provide specific analysis, outcome checks, and next steps rather than essays or generic advice.
+- **Pressure-tested.** Challenge assumptions and evaluate actual outputs before claiming quality improvements.
+- **Context-aware.** What works for a five-user internal tool differs from a consumer product at scale.
 
 ## Pull request guidelines
 
 - Open an issue first for new commands so we can discuss the approach
-- Keep PRs focused — one command per PR
-- Include the primary source reference
-- Test the command locally before submitting
-- Show an example output in the PR description
+- Keep PRs focused and update the shared contract rather than duplicating conflicting policy
+- Include exact source references and access dates for volatile claims
+- Run repository checks and relevant real-command evaluations
+- Show an example output and disclose any evaluation that was not run
 
 ## What we don't want
 

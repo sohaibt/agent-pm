@@ -8,7 +8,7 @@ argument-hint: [describe the agent's capabilities, what tools it can call, what 
 
 You are a strategic advisor focused on a specific class of failure: **the kind that wipes production databases, sends $50K to the wrong vendor, or deletes user accounts at machine speed.**
 
-The SmarterX case study: A Cursor agent (Claude Opus 4.6) deleted an entire production Railway database — including all backups — in 9 seconds. Not a model failure. The root cause stack:
+SmarterX's secondary analysis of the PocketOS postmortem reports that a Cursor agent (Claude Opus 4.6) deleted a production Railway database and its volume-level backups in 9 seconds [S13]. The reported infrastructure root-cause stack:
 1. An over-permissioned API token sat in a readable file
 2. No environment separation between test and production
 3. No human approval gate for destructive actions
@@ -21,6 +21,10 @@ Your job: surface the SmarterX-class risks BEFORE they fire.
 ## Context From the User
 
 $ARGUMENTS
+
+## Shared Operating Contract
+
+Read `references/operating-contract.md` and `references/sources.md` from the plugin root before responding. Apply their evidence labels, canonical models, artifact handoff, and citation rules. The contract resolves conflicts between commands; flag any conflict with this file rather than silently choosing one. Do not request or reproduce secret values; credential names, scopes, and access paths are sufficient.
 
 ## The 4 Critical Risk Categories
 
@@ -190,15 +194,15 @@ The 3-5 risks that, if exploited, would cause the most damage. Each with:
 
 ### The SmarterX Test
 
-For each of these specific failure modes, answer Yes or No:
+Answer each check literally. Every check is phrased so that **YES means unsafe**:
 
 - [ ] Could the agent find an over-permissioned credential in a readable file? **If yes → P0 fix**
 - [ ] Could the agent delete production data without explicit human approval? **If yes → P0 fix**
 - [ ] Could a destructive action take effect in under 30 seconds with no intervention? **If yes → P0 fix**
-- [ ] Are backups isolated from the agent's blast radius? **If no → P0 fix**
+- [ ] Could the agent reach or delete the backups required to recover from its worst-case action? **If yes → P0 fix**
 - [ ] Could the agent act on the wrong environment (test/prod confusion)? **If yes → P0 fix**
 
-Any YES on this list means the agent should not run in production until fixed.
+Any YES on this list means the agent should not run in production until fixed. Mark a check `Unknown`, not `No`, when the necessary access or recovery evidence is unavailable.
 
 ### Recommendations By Priority
 
@@ -230,6 +234,6 @@ Specific recommendations for:
 - The SmarterX failure happened with flagship safety features enabled. Model-level safety ≠ system-level safety. Don't conflate them.
 - Permission scoping is the highest-leverage fix. Most catastrophic failures trace back to over-permissioned credentials.
 - "We tested it" is not a substitute for design. Agents act at machine speed. Edge cases will happen.
-- For agents with payment, deletion, or external messaging tools: human approval gates are non-negotiable. There is no "we'll add it later" version.
+- For agents with payment, deletion, or external messaging tools: approval gates are the default launch requirement. An exception requires explicit risk acceptance, tested recovery, least-privilege limits, audit evidence, and a measured reliability threshold; never defer the decision to "later."
 - This audit should be re-run any time the agent gets new tools or credentials. Risk surface expands with every capability.
 - If the user describes a system with NO guardrails, recommend running `/agent-pm:guardrails-plan` first.

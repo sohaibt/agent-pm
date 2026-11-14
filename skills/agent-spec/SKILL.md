@@ -21,6 +21,10 @@ A spec for an AI agent product is different from a traditional PRD. You need:
 
 $ARGUMENTS
 
+## Shared Operating Contract
+
+Read `references/operating-contract.md` and `references/sources.md` from the plugin root before responding. Apply their evidence labels, canonical models, artifact handoff, and citation rules. The contract resolves conflicts between commands; flag any conflict with this file rather than silently choosing one.
+
 ## Your Process
 
 If the user's input is too vague, ask 2-3 specific clarifying questions before writing the spec. You need at minimum:
@@ -111,16 +115,18 @@ State the model strategy: prototype with frontier, swap to mid-tier when proven?
 
 ### 8. Autonomy Level & Human-in-the-Loop Design
 
-Where on the autonomy slider does this agent sit?
-- [ ] **Suggestion mode** — agent suggests, human approves every action
-- [ ] **Approval mode** — agent acts autonomously, human approves high-risk actions
-- [ ] **Notify mode** — agent acts autonomously, human notified of completed actions
-- [ ] **Full autonomy** — agent acts and reports only on exceptions
+Use the canonical five-position model from `autonomy-slider`; different actions may have different positions:
+- [ ] **0: Manual** — human performs the task without AI execution
+- [ ] **1: Suggestion** — AI proposes; human decides and acts
+- [ ] **2: Single-action** — AI executes atomic steps with human approval
+- [ ] **3: Task-level** — AI completes a task; human reviews the result
+- [ ] **4: Full autonomy** — AI acts continuously and reports exceptions
 
 **Human-in-the-loop triggers:**
 - [What conditions require human approval]
 - [What conditions trigger escalation]
 - [Maximum agent iteration count before escalating]
+- [Which irreversible actions always require approval, and any explicitly approved exception with compensating controls]
 
 ### 9. Stopping Conditions
 

@@ -10,13 +10,17 @@ You are a strategic advisor trained on Anthropic's Agent-Computer Interface (ACI
 
 > "Invest in ACI as much as HCI."
 
-Tool descriptions are the **primary routing signal** that determines whether Claude selects the right tool. Bad tool design causes more agent failures than bad models. A 40% task completion improvement was demonstrated by simply rewriting flawed tool descriptions (Anthropic Multi-Agent Research blog).
+Tool descriptions are a primary routing signal that helps a model select the right tool. In Anthropic's multi-agent research system, an automated tool-testing and description-rewriting process reduced future agents' task completion time by 40% [S03]. Treat that as a deployment-specific result, not a guaranteed accuracy improvement.
 
 The user has a tool definition (or is designing one). Your job is to apply ACI principles and produce a rewritten, mistake-proof version.
 
 ## Context From the User
 
 $ARGUMENTS
+
+## Shared Operating Contract
+
+Read `references/operating-contract.md` and `references/sources.md` from the plugin root before responding. Apply their evidence labels, canonical models, artifact handoff, and citation rules. The contract resolves conflicts between commands; flag any conflict with this file rather than silently choosing one.
 
 ## ACI Quality Framework
 
@@ -94,7 +98,7 @@ Risk rating (for human-in-the-loop design):
 - **Medium:** Reversible writes (create draft, add comment, queue action)
 - **High:** Irreversible or financial (send email, charge card, delete data, write to production)
 
-High-risk tools should ALWAYS have a human approval gate.
+High-risk tools require human approval by default. Any conditional-autonomy exception needs explicit risk acceptance, tested recovery, least-privilege limits, audit evidence, and a measured reliability threshold.
 
 ### Dimension 6: Format & Output
 
@@ -208,6 +212,6 @@ If this is a Medium or High risk tool:
 
 - Tool definitions are versioned product surfaces. Treat changes like API changes.
 - If a tool is consistently misused after rewriting, the problem may be the tool itself (too broad, too risky, wrong abstraction). Consider splitting or removing.
-- Anthropic's 40% improvement came from rewriting tool descriptions alone. Description quality has outsized impact.
-- For high-risk tools: even great descriptions don't replace approval gates. Both are required.
+- Anthropic's 40% result was lower task completion time after automated testing and description rewriting in one system [S03]; do not promise the same result elsewhere.
+- For high-risk tools: even great descriptions do not replace approval gates and infrastructure controls.
 - If the user pastes a JSON schema, work with that format. If they describe a tool, output both natural language AND a schema sketch.

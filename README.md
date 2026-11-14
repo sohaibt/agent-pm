@@ -2,7 +2,7 @@
 
 **The PM playbook for building AI agent products.**
 
-A Claude Code plugin with 12 slash commands covering the full agent product lifecycle — from "should this even be an agent?" through eval design to production safety. Grounded in primary sources from Anthropic, OpenAI, Karpathy, Hamel Husain, Linus Lee, and real production deployments.
+A Claude Code plugin with 12 slash commands covering agent qualification, architecture, specification, evaluation, economics, UX, safety, and production readiness. Commands share explicit evidence labels, canonical product policies, linked practitioner sources, and artifact handoffs.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-orange)](https://claude.ai/code)
@@ -13,14 +13,12 @@ A Claude Code plugin with 12 slash commands covering the full agent product life
 
 Building an AI agent product is a different job than building traditional software.
 
-You need to decide if it should even be an agent. Pick from 5 workflow patterns. Design tool descriptions that are actually UX surfaces. Build eval infrastructure before you ship. Model token costs at 4x or 15x baseline. Stack 7 guardrail layers. Audit permissions to prevent the SmarterX-class disaster. Position your feature on the autonomy spectrum. Run a 30-day correction loop in production.
+You need to decide if it should even be an agent, choose a proportionate architecture, design tools and verification UX, evaluate outcomes, model current costs, control permissions and destructive actions, and assign operational ownership. This knowledge is scattered across engineering guides, talks, evaluations, and incident analyses.
 
-All of this knowledge exists — scattered across blog posts, conference talks, papers, and failure post-mortems. There's no operationalized PM toolkit for "I want to ship an agent product."
-
-agent-pm changes that. Every command encodes a specific framework from a specific primary source. Not generic AI advice. Not vibe-coded prompts. Structured analysis grounded in what Anthropic, OpenAI, Karpathy, Hamel, and others actually recommend.
+agent-pm turns those sources into structured product workflows. It distinguishes sourced observations from assumptions and unknowns, reuses earlier decisions across commands, and recommends simpler alternatives when agentic complexity is unjustified.
 
 > "Building agents vs. operating agents safely are different disciplines."
-> — SmarterX post-mortem
+> — SmarterX analysis of the PocketOS incident
 
 ---
 
@@ -30,102 +28,96 @@ agent-pm changes that. Every command encodes a specific framework from a specifi
 
 | Command | What it does |
 |---------|-------------|
-| `/agent-pm:qualify-agent` | Determine whether a feature should be deterministic code, a single LLM call, a workflow, an agent, or multi-agent. Applies Anthropic's "bias toward simplicity" and OpenAI's three agent triggers. |
-| `/agent-pm:architecture-pattern` | Recommend the right pattern from Anthropic's 5 (prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer) plus OpenAI's multi-agent patterns. |
-| `/agent-pm:agent-spec` | Generate a complete PM spec (PRD-style) for an agent product — user job, success criteria, tools, autonomy level, eval criteria, failure modes. |
-| `/agent-pm:tool-design-review` | Review a tool definition for Agent-Computer Interface (ACI) quality. Based on Anthropic's "invest in ACI as much as HCI." Rewrites mistake-prone tools. |
+| `/agent-pm:qualify-agent` | Determines whether the feature should be deterministic code, a single LLM call, a workflow, an agent, or multi-agent, while separating problem evidence from architecture suitability. |
+| `/agent-pm:architecture-pattern` | Recommends a proportionate workflow or multi-agent pattern using task dependencies, latency, reliability, and cost tradeoffs. |
+| `/agent-pm:agent-spec` | Generates the central product specification and indexes specialist artifacts for evaluation, cost, autonomy, UX, and safety. |
+| `/agent-pm:tool-design-review` | Reviews tool contracts and rewrites unclear definitions without inventing toolkit boundaries when sibling tools are unavailable. |
 
 ### Phase 2: How Do I Build It?
 
 | Command | What it does |
 |---------|-------------|
-| `/agent-pm:eval-design` | Design a complete eval plan (Feature × Scenario × Assertion matrix, LLM-as-judge alignment, golden datasets). Based on Hamel Husain and Eugene Yan. |
-| `/agent-pm:cost-model` | Model per-task and monthly costs. Applies the 4x agent / 15x multi-agent multipliers. Identifies cost optimization opportunities. |
-| `/agent-pm:guardrails-plan` | Design a layered guardrail stack using OpenAI's 7 layers + mandatory human-in-the-loop triggers. |
-| `/agent-pm:risk-audit` | Audit for the specific failure modes that caused real production disasters — permission scoping, environment separation, destructive action gates, backup isolation. Prevents the SmarterX-class failure. |
+| `/agent-pm:eval-design` | Designs scenario assertions, organic human labels, judge alignment, held-out evaluation, and production outcomes. |
+| `/agent-pm:cost-model` | Builds bottom-up per-task and monthly cost ranges using current provider prices without double-counting architecture multipliers. |
+| `/agent-pm:guardrails-plan` | Designs applicable guardrail layers, default approval for high-risk actions, and infrastructure controls. |
+| `/agent-pm:risk-audit` | Audits permission scope, environment separation, destructive-action gates, backup isolation, and recovery evidence without requesting secret values. |
 
 ### Phase 3: How Do I Ship & Run It?
 
 | Command | What it does |
 |---------|-------------|
-| `/agent-pm:agent-ux-review` | Review UX against Linus Lee's 5 paradigms beyond chat. Surfaces chat-as-default anti-patterns. Designs the verification loop. |
-| `/agent-pm:autonomy-slider` | Position a feature on the autonomy spectrum (suggestion → execution → full autonomy) and design the verification UX. Based on Karpathy's autonomy slider. |
-| `/agent-pm:prod-readiness` | Pre-launch checklist covering training loops, ops ownership, infrastructure, observability, rollback plans, and on-call alerting. |
-| `/agent-pm:failure-mode-map` | Catalog the failure modes specific to this agent type and design mitigations for each — model, system, infrastructure, user, and operational categories. |
+| `/agent-pm:agent-ux-review` | Reviews interaction and verification UX using the same per-action autonomy model as the specification. |
+| `/agent-pm:autonomy-slider` | Assigns positions 0–4 per action and defines evidence-based transitions and rollback triggers. |
+| `/agent-pm:prod-readiness` | Assesses correction loops, ownership, infrastructure, observability, recovery, support, and launch blockers without false readiness percentages. |
+| `/agent-pm:failure-mode-map` | Prioritizes model, system, infrastructure, user, and operational failures with drills and residual risk. |
 
 Every command returns:
-- **Structured analysis** with scoring and frameworks
-- **Specific next steps** grounded in primary sources
-- **Pressure-test questions** to challenge assumptions
-- **Honest assessment** including when the recommended approach won't work
+- Structured analysis with source IDs and explicit assumptions or unknowns
+- Specific next steps and an operational or user-facing outcome check
+- Pressure-test questions to challenge assumptions
+- An artifact handoff that preserves earlier decisions
+
+You do **not** need to run all twelve commands for every project.
 
 ---
 
 ## Install
 
-### Claude Code
+### Claude Code marketplace
+
+If `agent-pm` is listed in your configured marketplace:
 
 ```bash
 claude plugin install agent-pm
 ```
 
-### Test locally (development)
+### Local development
 
 ```bash
 git clone https://github.com/sohaibt/agent-pm.git
 claude --plugin-dir ./agent-pm
 ```
 
-Then try:
+## Ten-minute quickstart
 
+Start with the problem and current alternative, not a preferred architecture:
+
+```text
+/agent-pm:qualify-agent Our five-person support team handles billing questions by searching help-center articles and drafting replies manually. We are considering an agent that classifies questions, retrieves policy, and drafts a response. A human sends every response. We have no quality baseline yet.
 ```
-/agent-pm:qualify-agent We're building a customer support AI for our SaaS product. Users will ask billing questions, technical questions, and general FAQs. Currently handled by a human team of 5. We want to deploy in 6 weeks.
+
+Then follow only the recommended path:
+
+```text
+/agent-pm:architecture-pattern Use the previous qualification. Choose a pattern only if the task needs one.
+/agent-pm:agent-spec Use the previous decisions and label missing inputs.
+/agent-pm:eval-design Build the smallest useful evaluation for this spec.
+/agent-pm:prod-readiness Assess readiness using the spec and eval plan; do not invent operational evidence.
 ```
 
----
+Each response ends with an artifact handoff. Commands do not write files unless you ask; to persist a response, say `Save the artifact handoff for project billing-support`.
 
-## Example: Qualify Agent
-
-**Ask:**
-
-> /agent-pm:qualify-agent We want to build an AI that automates expense report approval. It needs to read receipts, check against policy, approve or escalate.
-
-**What you get:**
-
-A recommendation against the simplicity ladder (deterministic / single LLM / workflow / agent / multi-agent), assessment against OpenAI's three agent triggers, hidden cost surfacing (eval infrastructure, observability, latency multipliers), red flags detected in your framing, and 3 pressure-test questions to challenge the recommendation.
+See [the complete illustrative workflow](examples/billing-support/README.md) for qualification, architecture, specification, evaluation, cost, and readiness artifacts.
 
 ---
 
-## Example: Eval Design
+## Shared Rules and Sources
 
-**Ask:**
+- [Operating contract](references/operating-contract.md): canonical architecture, autonomy, high-risk approval, evaluation, cost, readiness, and artifact-handoff rules
+- [Source map](references/sources.md): exact links, publication and access dates, claim mappings, and limitations for primary material and secondary case analyses
+- [Changelog](CHANGELOG.md): behavior changes and corrections
 
-> /agent-pm:eval-design Our agent answers technical questions about our API. We have 200 historical Q&A pairs. Team of 2 engineers and 1 PM. Want to ship in 4 weeks.
+Source-backed observations are not universal promises. Current model names, prices, limits, and APIs must be checked against provider documentation.
 
-**What you get:**
+## Quality and Product Success
 
-A complete eval plan: Feature × Scenario × Assertion matrix (Level 1 unit tests), synthetic test case generator prompt customized to your domain, human label dataset structure (200 examples, oversample failures), trace viewer spec (build in 1 day), LLM-as-judge prompts per dimension, the human-LLM alignment workflow with Cohen's Kappa target, and tracking infrastructure recommendations.
+- [Evaluation guide](evals/README.md): repository checks and real-command prompt evaluations
+- [Prompt scenarios](evals/prompt-scenarios.md): over-engineering, destructive risk, cross-command consistency, cost, evaluation alignment, vague input, and artifact handoffs
+- [Output rubric](evals/output-rubric.md): source fidelity, safety, uncertainty, consistency, specificity, and outcomes
+- [Success metrics](references/success-metrics.md): decision adoption, workflow continuity, repeat use, and quality guardrails
+- [Pilot scorecard](evals/pilot-scorecard.md): evidence collection for real-project pilots
 
----
-
-## The Research Behind It
-
-This plugin is grounded in 12 primary sources, not generic AI advice:
-
-1. **Anthropic — "Building Effective Agents"** — The 5 workflow patterns
-2. **Anthropic — "How we built our multi-agent research system"** — Production lessons
-3. **Anthropic — "Tool Use" docs** — ACI design principles
-4. **Barry Zhang (Anthropic) — AI Engineer Summit talk** — "Don't build agents for everything"
-5. **OpenAI — "A Practical Guide to Building Agents"** — Manager/decentralized patterns, 7-layer guardrails
-6. **Andrej Karpathy — "Software is Changing Again"** — Software 3.0, autonomy slider, partial autonomy
-7. **Hamel Husain — "Your AI Product Needs Evals"** — The foundational eval framework
-8. **Eugene Yan — "Product Evals in 3 Steps"** — LLM-as-judge alignment
-9. **Linus Lee — "Generative Interfaces Beyond Chat"** — UX paradigms beyond chat
-10. **Lenny's Podcast — "20 AI Agents Sales Team"** — Real production deployment lessons
-11. **Vantage — "Cursor Pricing Explained"** — Agent product economics
-12. **SmarterX — "AI Agent Database Deletion"** — Production failure case study
-
-Every recommendation in the plugin traces back to a specific framework, quote, or principle from these sources.
+The repository includes an evaluation process, not a claim that all model-run evaluations or real-user pilots have passed.
 
 ---
 

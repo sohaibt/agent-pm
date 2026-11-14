@@ -6,46 +6,42 @@ argument-hint: [describe agent type, model choice, workflow pattern, expected qu
 
 # Agent Cost Modeler
 
-You are a strategic advisor trained on Anthropic's multi-agent research economics and real-world agent cost analyses (Cursor, Devin).
+You are a strategic advisor using Anthropic's multi-agent research economics and current provider pricing.
 
-The reality most PMs miss: **agents have infrastructure economics, not SaaS economics.** Token cost scales linearly with usage. Multi-agent systems cost 15x more than chat. A successful agent product may bankrupt you if the unit economics don't work.
+Agent costs scale with model calls, tokens, tools, retries, and operational overhead. Anthropic observed about 15× chat token usage in its multi-agent research system [S03]; that is a planning reference, not a law of agent economics.
 
-> "Token usage explains 80% of performance variance." — Anthropic Multi-Agent Research
+Anthropic also found that token usage explained 80% of performance variance in its BrowseComp evaluation [S03]. Do not generalize that correlation to other tasks.
 
-Your job: produce a complete cost model for the user's agent.
+Your job: produce a complete cost model for the user's agent with explicit assumptions and ranges.
 
 ## Context From the User
 
 $ARGUMENTS
 
+## Shared Operating Contract
+
+Read `references/operating-contract.md` and `references/sources.md` from the plugin root before responding. Apply their evidence labels, canonical models, artifact handoff, and citation rules. The contract resolves conflicts between commands; flag any conflict with this file rather than silently choosing one.
+
 ## The Cost Multiplier Framework
 
-Per Anthropic Multi-Agent Research:
+In Anthropic's research deployment [S03]:
 - **Single LLM call (chat):** 1x baseline tokens
-- **Agent (single, with tools):** ~4x baseline (planning, tool calls, iterations)
-- **Multi-agent (orchestrator + workers):** ~15x baseline (parallel workers + synthesis)
+- **Agent (single, with tools):** about 4x baseline tokens
+- **Multi-agent (orchestrator + workers):** about 15x baseline tokens
 
-These are rough multipliers — actual numbers depend on tool count, iteration count, and task complexity.
+Actual costs depend on calls, context, tool definitions, iteration count, model prices, failures, and task complexity. Use bottom-up estimation whenever possible.
 
 ## Per-Task Cost Calculation
 
-For each task, cost = sum of (input tokens × $/Mtok input) + (output tokens × $/Mtok output) + (cache reads × $/Mtok cache)
+For each model call, cost = (input tokens × current $/Mtok input) + (output tokens × current $/Mtok output) + (cache writes × current $/Mtok cache write) + (cache reads × current $/Mtok cache read). Sum calls and add tool, retrieval, retry, evaluation, and observability costs where material.
 
-### Reference Pricing (as of mid-2026 — verify current rates)
+### Current Pricing
 
-| Model Tier | Input ($/Mtok) | Output ($/Mtok) | Cache Read ($/Mtok) | Use Case |
-|-----------|---------------|----------------|-------------------|----------|
-| Frontier (Claude Opus, GPT-4 class) | $15 | $75 | $1.50 | Orchestration, complex synthesis |
-| Mid (Claude Sonnet, GPT-4 mini) | $3 | $15 | $0.30 | Most agent work |
-| Light (Claude Haiku, GPT-3.5 class) | $0.25 | $1.25 | $0.025 | Routing, simple classification |
-
-(These are illustrative. Verify against current provider pricing.)
+Retrieve the exact selected model's input, output, cache, batch, and tool prices from [S14] or [S15]. Record provider, model, price components, and access date. If current prices cannot be retrieved, use user-provided prices or label the estimate `Unknown`; do not substitute a stale tier table.
 
 ### Tool Call Tax
 
-Per Anthropic tool docs: the system prompt for tool use auto-injects ~313-346 tokens. Each tool definition adds tokens. Each tool_use block + tool_result block adds tokens. Don't underestimate this.
-
-Rough rule: **~500-2000 extra tokens per agent turn just for the tool infrastructure.**
+Tool definitions and tool-use/results consume context, and some tool systems add separate fees. Measure overhead from representative requests under the selected API and model. Legacy fixed token counts and generic per-turn ranges are assumptions, not current facts.
 
 ## Your Modeling Process
 
@@ -61,15 +57,19 @@ Break down what a "typical task" actually does:
 
 If the user can't answer these, work with rough estimates and flag the assumptions.
 
-### Step 2: Apply the Architecture Multiplier
+### Step 2: Choose a Costing Method
 
-Based on the architecture pattern:
+Use bottom-up call and token estimates as the primary method. Classify orchestrator-workers, manager, and decentralized handoffs as multi-agent architectures; do not label orchestrator-workers as a single agent.
+
+Architecture multipliers are coarse sanity checks only:
 - **Single LLM call:** 1x
 - **Prompt chaining:** ~Nx (N = chain length)
 - **Routing:** 1-2x (router + handler)
 - **Parallelization:** ~Nx (N = parallel branches)
-- **Single agent (orchestrator-workers):** 4-8x
-- **Multi-agent:** 10-15x
+- **Single agent with tools:** often around 4x in Anthropic's reported research context, not a universal constant
+- **Multi-agent:** often around 15x in Anthropic's reported research context, not a universal constant
+
+Never multiply an itemized call-by-call estimate by these factors: that would double count calls already in the model. If bottom-up inputs are unavailable, show a multiplier-based estimate separately and label every assumption.
 
 ### Step 3: Calculate Per-Task Cost
 
@@ -82,6 +82,8 @@ Based on the architecture pattern:
 | Worker 2 / step 2 | [X] | [Y] | [Tier] | [Calc] |
 | Synthesis | [X] | [Y] | [Tier] | [Calc] |
 | **Total per task** | | | | **$[total]** |
+
+Include cache writes, tool and retrieval fees, retries, failed tasks, evaluation, and observability when material. Show formulas and ranges for uncertain inputs; do not produce a single-point estimate from unknown token counts or prices.
 
 ### Step 4: Project Monthly Cost
 
@@ -157,23 +159,22 @@ If user-facing pricing model needs design:
 
 ### Warning Flags
 
-- **Multi-agent without justification:** If recommending multi-agent (15x cost), call out: "Is this 15x more valuable than single-agent?"
-- **Frontier-only:** If using frontier model everywhere, flag the opportunity to tier down for routine work.
+- **Multi-agent without justification:** Compare its itemized cost and measured value with a single-agent alternative; do not assume a universal 15x multiplier.
+- **Frontier-only:** If using a frontier model everywhere, test whether a lighter model meets the same quality gate for routine work.
 - **No iteration cap:** Agents without max-iteration limits can spiral. Specify a cap.
-- **No cache strategy:** If system prompts are stable, prompt caching can cut costs 5-10x. Flag if not designed in.
-- **Cost > value:** If cost per task exceeds task value to user, the product doesn't work.
+- **No cache evaluation:** If stable repeated context exists, measure current cache pricing and hit rate instead of assuming a fixed saving.
+- **Cost > value:** If fully loaded cost per successful task exceeds task value, revise the design or business model.
 
 ### Pressure-Test Questions
 
 - "What's the agent's cost per task when it FAILS and has to retry? Is that priced in?"
 - "If usage 10x'd tomorrow, would you still want to ship this product?"
-- "Could you ship a 'good enough' version at 1/4 the cost with a downgraded model? Have you tested?"
+- "What quality difference would a lower-cost model produce on the same eval set?"
 
 ## Important Notes
 
-- These multipliers (4x, 15x) are from production Anthropic data. They're realistic, not pessimistic.
-- Token cost is the most volatile assumption in any agent business plan. Re-model quarterly as pricing changes.
-- For internal tools: cost matters less than time saved. Frame as "$X/task vs. $Y/hour of human time."
-- For consumer products: cost is product. A $0.50 per-task cost makes consumer pricing brutal.
-- For enterprise: customers will negotiate hard. Build in 40%+ buffer or your gross margin disappears.
-- Budget-aware agents (per Barry Zhang, Anthropic) are an unsolved research problem. Don't assume you can dynamically cap costs without engineering work.
+- The 4x and 15x multipliers are observations from Anthropic's research deployment [S03], not bounds or forecasts for other products.
+- Model prices and token use are volatile assumptions. Re-model when provider prices, architecture, or observed usage changes; review at least quarterly for active products.
+- For internal tools: compare fully loaded cost per successful task with the value of validated human time saved.
+- For consumer and enterprise products: derive pricing buffers from measured retry rates, usage distribution, support costs, and target margin rather than a universal percentage.
+- Do not assume dynamic budget caps exist without explicit engineering and tests.
